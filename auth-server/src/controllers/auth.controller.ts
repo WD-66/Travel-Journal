@@ -1,14 +1,11 @@
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import type { RequestHandler } from 'express';
-import { ACCESS_JWT_SECRET, REFRESH_TOKEN_TTL, SALT_ROUNDS, ACCESS_TOKEN_TTL } from '#config';
+import { SALT_ROUNDS } from '#config';
 import { User } from '#models';
 import { createTokens, setAuthCookies } from '#utils';
 
 export const register: RequestHandler = async (req, res) => {
-  // TODO: Implement user registration
-  // Make sure to securely hash the password and storing only the hash
-  // Issue an access and a refresh token and put them in cookies
-  // Also store the refresh token in your db
   // we need access the user info from the request body
   const { firstName, lastName, email, password } = req.body;
   // check if user has that email already
@@ -32,34 +29,90 @@ export const register: RequestHandler = async (req, res) => {
 };
 
 export const login: RequestHandler = async (req, res) => {
-  // TODO: Implement user login
-  // Check if the user exists in the database
-  // Compare the password from the request with the hash in your db
-  // Send an Error "Incorrect credentials" if either no user is found (invalid email) or the password is incorrect
-  // Issue tokens and put them into cookies
-  // Also store the refresh token in your db
+  // get email and password from request body
+  //
+  // query the DB to find user with that email
+  //
+  // if not user is found, throw a 401 error and indicate invalid credentials
+  //
+  // compare the password to the hashed password in the DB with bcrypt
+  // const match = await bcrypt.compare(password, user.password)
+  //
+  // if match is false, throw a 401 error and indicate invalid credentials
+  //
+  // delete all Refresh Tokens in DB where userId is equal to _id of user
+  //
+  // create new tokens with util function
+  //
+  // set auth cookies with util function
+  //
+  // send generic success response in body of response
 };
 
 export const refresh: RequestHandler = async (req, res) => {
-  // TODO: Implement access token refresh and refresh token rotation
-  // Get the refresh token from the cookies and verify it
-  // Look up the refresh token in the database, throw and error, if it canot be found
-  // delete the old refresh token, look up the user and issue new tokens
-  // store the new refresh token in your db and send both access and refresh token via cookies
+  // get refreshToken from request cookies
+  console.log(req.cookies);
+
+  // if there is no refresh token throw a 401 error with an appropriate message
+  //
+  // query the DB for a RefreshToken that has a token property that matches the refreshToken
+  //
+  // if no storedToken is found, throw a 403 error with an appropriate message
+  //
+  // delete the storedToken from the DB
+  //
+  // query the DB for the user with _id that matches the userId of the storedToken
+  //
+  // if not user is found, throw a 403 error
+  //
+  // create new tokens with util function
+  //
+  // set auth cookies with util function
+  //
+  // send generic success response in body of response
 };
 
 export const logout: RequestHandler = async (req, res) => {
-  // TODO: Implement logout by removing the tokens
-  // Get the tokens from the cookies
-  // Delete the refresh token from your database
-  // Clear both cookies
-  // A longer living access token, or a token in a higher risk use case would need to be put on a token blacklist - another entry in your db - and checked on validation
-  // Since our access tokens are valid for a couple of minutes the risk here is acceptable
+  // get refreshToken from request cookies
+  console.log(req.cookies);
+
+  // if there is a refreshToken cookie, delete corresponding RefreshToken from the DB
+  //
+  // clear the refreshToken cookie
+  res.clearCookie('refreshToken');
+
+  // clear the accessToken cookie
+  //
+  // send generic success message in response body
 };
 
 export const me: RequestHandler = async (req, res, next) => {
-  // TODO: Implement a me handler
-  // Get the access token and use it to retrieve the user's data
-  // Make sure that the token is valid and not expired
-  // When expired, send a WWW-Authenticate Header with a 'token_expired' payload
+  // get accessToken from request cookies
+  console.log(req.cookies);
+
+  // if there is no access token throw a 401 error with an appropriate message
+  //
+
+  try {
+    // verify the access token
+    // const decoded = jwt.verify(accessToken, ACCESS_JWT_SECRET) as jwt.JwtPayload;
+    // console.log(decoded)
+    //
+    // if there is now decoded.sub if false, throw a 403 error and indicate Invalid or expired token
+    //
+    // query the DB to find user by id that matches decoded.sub
+    //
+    // throw a 404 error if no user is found
+    //
+    // send generic success message in response body
+  } catch (error) {
+    // if error is an because token was expired, call next with a 401 and `ACCESS_TOKEN_EXPIRED' code
+    if (error instanceof jwt.TokenExpiredError) {
+      next(
+        new Error('Expired access token', { cause: { status: 401, code: 'ACCESS_TOKEN_EXPIRED' } })
+      );
+    } else {
+      // call next with a new 401 Error indicated invalid access token
+    }
+  }
 };

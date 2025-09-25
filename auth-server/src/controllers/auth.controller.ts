@@ -1,11 +1,34 @@
+import bcrypt from 'bcrypt';
 import type { RequestHandler } from 'express';
-import { ACCESS_JWT_SECRET, REFRESH_TOKEN_TTL, SALT_ROUNDS } from '#config';
+import { ACCESS_JWT_SECRET, REFRESH_TOKEN_TTL, SALT_ROUNDS, ACCESS_TOKEN_TTL } from '#config';
+import { User } from '#models';
+import { createTokens, setAuthCookies } from '#utils';
 
 export const register: RequestHandler = async (req, res) => {
   // TODO: Implement user registration
   // Make sure to securely hash the password and storing only the hash
   // Issue an access and a refresh token and put them in cookies
   // Also store the refresh token in your db
+  // we need access the user info from the request body
+  const { firstName, lastName, email, password } = req.body;
+  // check if user has that email already
+  const userExists = await User.exists({ email });
+
+  // throw an error if a user has that email
+  if (userExists) throw new Error('Email already exists', { cause: { status: 409 } });
+
+  const salt = await bcrypt.genSalt(SALT_ROUNDS);
+  const hashedPW = await bcrypt.hash(password, salt);
+
+  // create user in DB with create method
+  const user = await User.create({ firstName, lastName, email, password: hashedPW });
+
+  const [refreshToken, accessToken] = await createTokens(user);
+
+  setAuthCookies(res, refreshToken, accessToken);
+
+  // send the new user in the response
+  res.status(201).json({ message: 'Registered' });
 };
 
 export const login: RequestHandler = async (req, res) => {

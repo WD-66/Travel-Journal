@@ -6,7 +6,7 @@ const validateZod =
   (zodSchema: ZodObject): RequestHandler =>
   (req, _res, next) => {
     const { data, error, success } = zodSchema.safeParse(req.body);
-    console.log({ data, error, success });
+    // console.log({ data, error, success });
     if (!success) {
       next(
         new Error(z.prettifyError(error), {

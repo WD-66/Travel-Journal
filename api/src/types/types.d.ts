@@ -7,4 +7,13 @@ declare global {
   type SignInRequestBody = z.infer<typeof signInSchema>;
 
   type SanitizedBody = UserRequestBody | PostRequestBody | SignInRequestBody;
+
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        roles: string[];
+      };
+    }
+  }
 }

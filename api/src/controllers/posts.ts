@@ -16,28 +16,55 @@ export const getSinglePost: RequestHandler = async (req, res) => {
   const {
     params: { id }
   } = req;
-  if (!isValidObjectId(id)) throw new Error('Invalid id', { cause: 400 });
+  if (!isValidObjectId(id)) throw new Error('Invalid id', { cause: { status: 400 } });
   const post = await Post.findById(id).lean().populate('author');
-  if (!post) throw new Error(`Post with id of ${id} doesn't exist`, { cause: 404 });
+  if (!post) throw new Error(`Post with id of ${id} doesn't exist`, { cause: { status: 404 } });
   res.send(post);
 };
 
 export const updatePost: RequestHandler = async (req, res) => {
   const {
-    params: { id }
+    params: { id },
+    body: { title, content, image },
+    user
   } = req;
-  if (!isValidObjectId(id)) throw new Error('Invalid id', { cause: 400 });
-  const updatedPost = await Post.findByIdAndUpdate(id, req.body, { new: true }).populate('author');
-  if (!updatedPost) throw new Error(`Post with id of ${id} doesn't exist`, { cause: 404 });
-  res.json(updatedPost);
+
+  console.log(user);
+  if (!isValidObjectId(id)) throw new Error('Invalid id', { cause: { status: 400 } });
+
+  const post = await Post.findById(id);
+
+  if (!post) throw new Error(`Post with id of ${id} doesn't exist`, { cause: { status: 404 } });
+
+  if (user?.id !== post.author.toString() && !user?.roles.includes('admin')) {
+    throw new Error('Not authorized', { cause: { status: 403 } });
+  }
+
+  post.title = title;
+  post.content = content;
+  post.image = image;
+
+  await post.save();
+
+  await post.populate('author');
+
+  res.json(post);
 };
 
 export const deletePost: RequestHandler = async (req, res) => {
   const {
-    params: { id }
+    params: { id },
+    user
   } = req;
-  if (!isValidObjectId(id)) throw new Error('Invalid id', { cause: 400 });
-  const deletedPost = await Post.findByIdAndDelete(id).populate('author');
-  if (!deletedPost) throw new Error(`Post with id of ${id} doesn't exist`, { cause: 404 });
+  if (!isValidObjectId(id)) throw new Error('Invalid id', { cause: { status: 400 } });
+
+  const post = await Post.findById(id);
+  if (!post) throw new Error(`Post with id of ${id} doesn't exist`, { cause: { status: 404 } });
+
+  if (user?.id !== post.author.toString() && !user?.roles.includes('admin')) {
+    throw new Error('Not authorized', { cause: { status: 403 } });
+  }
+
+  await Post.findByIdAndDelete(id);
   res.json({ success: `Post with id of ${id} was deleted` });
 };

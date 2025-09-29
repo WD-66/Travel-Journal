@@ -1,7 +1,8 @@
 import { z } from 'zod/v4';
+import { Types } from 'mongoose';
 
 const emailError = 'Please provide a valid email address.';
-const emailSchema = z.string({ error: emailError }).trim().email({ error: emailError });
+const emailSchema = z.email({ error: emailError }).trim();
 
 const basePasswordSchema = z
   .string({ error: 'Password must be a string' })
@@ -11,7 +12,7 @@ const basePasswordSchema = z
 const serviceSchema = z.string().max(128).optional();
 
 export const registerSchema = z
-  .object(
+  .strictObject(
     {
       email: emailSchema,
       password: basePasswordSchema
@@ -27,10 +28,21 @@ export const registerSchema = z
     },
     { error: 'Please provide a valid email and a secure password.' }
   )
-  .strict()
+
   .refine(data => data.password === data.confirmPassword, { error: "Passwords don't match" });
 
 export const loginSchema = z.object({
   email: emailSchema,
   password: basePasswordSchema
+});
+
+export const userSchema = registerSchema.omit({ confirmPassword: true });
+
+export const userProfileSchema = z.object({
+  ...userSchema.omit({ password: true }).shape,
+  firstName: z.string(),
+  _id: z.instanceof(Types.ObjectId),
+  roles: z.array(z.string()),
+  createdAt: z.date(),
+  __v: z.int().nonnegative()
 });

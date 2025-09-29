@@ -23,8 +23,8 @@ export const registerSchema = z
           error: 'Password must include at least one special character'
         }),
       confirmPassword: z.string(),
-      firstName: z.string().min(1).max(50).optional(),
-      lastName: z.string().min(1).max(50).optional()
+      firstName: z.string().min(1).max(50).nullish(),
+      lastName: z.string().min(1).max(50).nullish()
     },
     { error: 'Please provide a valid email and a secure password.' }
   )
@@ -40,7 +40,6 @@ export const userSchema = registerSchema.omit({ confirmPassword: true });
 
 export const userProfileSchema = z.object({
   ...userSchema.omit({ password: true }).shape,
-  firstName: z.string(),
   _id: z.instanceof(Types.ObjectId),
   roles: z.array(z.string()),
   createdAt: z.date(),

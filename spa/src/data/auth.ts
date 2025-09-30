@@ -8,7 +8,6 @@ const login = async (formData: LoginData): Promise<SuccessRes> => {
 		headers: {
 			'Content-Type': 'application/json'
 		},
-		credentials: 'include',
 		body: JSON.stringify(formData)
 	});
 	if (!res.ok) throw new Error('Something went wrong!');
@@ -19,9 +18,7 @@ const login = async (formData: LoginData): Promise<SuccessRes> => {
 };
 
 const me = async (): Promise<User> => {
-	const res = await fetch(`${authServiceURL}/me`, {
-		credentials: 'include'
-	});
+	const res = await fetch(`${authServiceURL}/me`);
 
 	if (!res.ok) throw new Error('Something went wrong!');
 
@@ -41,4 +38,19 @@ const logout = async (): Promise<SuccessRes> => {
 	return data;
 };
 
-export { login, me, logout };
+const register = async (formData: RegisterFormState): Promise<SuccessRes> => {
+	const res = await fetch(`${authServiceURL}/register`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(formData)
+	});
+	if (!res.ok) throw new Error('Something went wrong!');
+
+	const data = (await res.json()) as SuccessRes;
+
+	return data;
+};
+
+export { login, me, logout, register };

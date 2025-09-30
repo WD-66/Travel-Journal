@@ -15,7 +15,7 @@ window.fetch = async (url, urlToHttpOptions, ...rest) => {
 	);
 
 	const authHeader = res.headers.get('www-authenticate');
-	console.log('authHeader', authHeader);
+	// console.log('authHeader', authHeader);
 	if (authHeader?.includes('token_expired')) {
 		console.log('ATTEMPT REFRESH');
 		const refreshRes = await originalFetch(`${authServiceURL}/refresh`, {

@@ -3,7 +3,12 @@ import { toast } from 'react-toastify';
 import { useAuth } from '@/context';
 
 const Navbar = () => {
-	const { handleSignOut } = useAuth();
+	const { handleSignOut, signedIn, user } = useAuth();
+
+	const welcomeMsg =
+		user && user?.firstName
+			? `Welcome back, ${user.firstName}`
+			: 'Welcome back';
 
 	const handleLogout = async () => {
 		try {
@@ -29,25 +34,33 @@ const Navbar = () => {
 					</span>
 				</Link>
 			</div>
-			<div className='flex-none'>
+			<div className='flex-none flex items-center'>
+				{user && <p>{welcomeMsg}</p>}
 				<ul className='menu menu-horizontal px-1'>
 					<li>
 						<NavLink to='/'>Home</NavLink>
 					</li>
-					<li>
-						<NavLink to='/create'>Create post</NavLink>
-					</li>
-					<li>
-						<NavLink to='/register'>Register</NavLink>
-					</li>
-					<li>
-						<NavLink to='/login'>Login</NavLink>
-					</li>
-					<li>
-						<button onClick={handleLogout} className='btn btn-primary'>
-							Logout
-						</button>
-					</li>
+					{/* if we are signed in, render create post button, and logout btn */}
+					{/* else render register and login */}
+					{signedIn ? (
+						<>
+							<li>
+								<NavLink to='/create'>Create post</NavLink>
+							</li>
+							<li>
+								<button onClick={handleLogout}>Logout</button>
+							</li>
+						</>
+					) : (
+						<>
+							<li>
+								<NavLink to='/register'>Register</NavLink>
+							</li>
+							<li>
+								<NavLink to='/login'>Login</NavLink>
+							</li>
+						</>
+					)}
 				</ul>
 			</div>
 		</div>

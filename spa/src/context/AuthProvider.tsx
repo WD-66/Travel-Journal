@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { AuthContext } from '.';
-import { login, me, logout } from '@/data';
+import { login, me, logout, register } from '@/data';
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [signedIn, setSignedIn] = useState(false);
@@ -9,6 +9,12 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 	const handleSignIn = async ({ email, password }: LoginData) => {
 		await login({ email, password });
+		setSignedIn(true);
+		setCheckSession(true);
+	};
+
+	const handleRegister = async (formState: RegisterFormState) => {
+		await register(formState);
 		setSignedIn(true);
 		setCheckSession(true);
 	};
@@ -40,7 +46,8 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 		signedIn,
 		user,
 		handleSignOut,
-		handleSignIn
+		handleSignIn,
+		handleRegister
 	};
 
 	return <AuthContext value={value}>{children}</AuthContext>;

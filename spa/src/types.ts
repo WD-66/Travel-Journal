@@ -23,5 +23,14 @@ declare global {
 		user: User | null;
 		handleSignIn: ({ email, password }: LoginData) => Promise<void>;
 		handleSignOut: () => Promise<void>;
+		handleRegister: (formState: RegisterFormState) => Promise<void>;
+	};
+
+	type RegisterFormState = {
+		firstName: string;
+		lastName: string;
+		email: string;
+		password: string;
+		confirmPassword: string;
 	};
 }

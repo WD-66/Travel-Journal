@@ -9,14 +9,17 @@ const hasRole = (...allowedRoles: string[]): RequestHandler => {
     }
     const { id } = req.params;
     const { roles: userRoles, id: userId } = req.user;
+    let post: InstanceType<typeof Post> | null = null;
 
     // query db for post
-    const post = await Post.findById(id);
-    if (!post) {
-      next(new Error(`Post with id of ${id} doesn't exist`, { cause: { status: 404 } }));
-      return;
+    if (id) {
+      post = await Post.findById(id);
+      if (!post) {
+        next(new Error(`Post with id of ${id} doesn't exist`, { cause: { status: 404 } }));
+        return;
+      }
+      req.post = post;
     }
-    req.post = post;
     // if user's roles include admin, call next right away
     if (userRoles.includes('admin')) {
       next();
@@ -26,7 +29,7 @@ const hasRole = (...allowedRoles: string[]): RequestHandler => {
     // if roles parameters include self
     if (allowedRoles.includes('self')) {
       // and compare it to user.id
-      if (userId !== post.author.toString()) {
+      if (userId !== post?.author.toString()) {
         next(new Error('Not authorized', { cause: { status: 403 } }));
         return;
       }

@@ -24,7 +24,7 @@ const Login = () => {
 		try {
 			if (!email || !password) throw new Error('All fields are required');
 			setLoading(true);
-			console.log(email, password);
+			// console.log(email, password);
 			// TODO: Add login logic
 			await handleSignIn({ email, password });
 			toast.success('Login attempted (not implemented)');

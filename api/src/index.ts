@@ -8,7 +8,13 @@ import { postsRouter } from '#routes';
 const app = express();
 const port = process.env.PORT || 8000;
 
-app.use(cors({ origin: '*' }));
+app.use(
+  cors({
+    origin: process.env.CLIENT_BASE_URL, // for use with credentials, origin(s) need to be specified
+    credentials: true, // sends and receives secure cookies
+    exposedHeaders: ['WWW-Authenticate'] // needed to send the 'refresh trigger''
+  })
+);
 app.use(express.json(), cookieParser());
 app.use('/posts', postsRouter);
 app.use('/*splat', (_req, res) => {

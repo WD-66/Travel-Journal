@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-
+import { deletePost } from '@/data';
 type DeleteModalProps = {
 	_id: string;
+	setPosts: SetPosts;
 };
 
 // get posts state setter from props to update UI
-const DeleteModal = ({ _id }: DeleteModalProps) => {
+const DeleteModal = ({ _id, setPosts }: DeleteModalProps) => {
 	const [value, setValue] = useState('');
 	const [isValid, setIsValid] = useState(false);
 
@@ -14,9 +15,9 @@ const DeleteModal = ({ _id }: DeleteModalProps) => {
 		e.preventDefault();
 		try {
 			// delete post in DB
-			//
+			await deletePost(_id);
 			// update posts state to remove deleted post
-			//
+			setPosts((prev) => prev.filter((post) => post._id !== _id));
 		} catch (error) {
 			const message = (error as { message: string }).message;
 			toast.error(message);

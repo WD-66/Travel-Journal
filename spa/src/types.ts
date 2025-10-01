@@ -1,3 +1,4 @@
+import type { Dispatch, SetStateAction } from 'react';
 declare global {
 	type Post = {
 		_id: string;
@@ -33,4 +34,5 @@ declare global {
 		password: string;
 		confirmPassword: string;
 	};
+	type SetPosts = Dispatch<SetStateAction<Post[]>>;
 }

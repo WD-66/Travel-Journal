@@ -38,7 +38,8 @@ export const createPost = async (
 		headers: {
 			'Content-Type': 'application/json'
 		},
-		body: JSON.stringify(formData)
+		body: JSON.stringify(formData),
+		credentials: 'include'
 	});
 	if (!res.ok) {
 		const errorData = await res.json();
@@ -61,7 +62,8 @@ export const updatePost = async (
 		headers: {
 			'Content-Type': 'application/json'
 		},
-		body: JSON.stringify(formData)
+		body: JSON.stringify(formData),
+		credentials: 'include'
 	});
 	if (!res.ok) {
 		const errorData = await res.json();
@@ -77,7 +79,8 @@ export const updatePost = async (
 // delete post fetch request
 export const deletePost = async (id: string): Promise<{ message: string }> => {
 	const res = await fetch(`${baseURL}/${id}`, {
-		method: 'DELETE'
+		method: 'DELETE',
+		credentials: 'include'
 	});
 	if (!res.ok) {
 		const errorData = await res.json();

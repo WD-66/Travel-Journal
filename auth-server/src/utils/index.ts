@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { randomUUID } from 'node:crypto';
 import type { Types } from 'mongoose';
-import type { Response } from 'express';
+import type { Response, CookieOptions } from 'express';
 import { ACCESS_JWT_SECRET, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from '#config';
 import { RefreshToken } from '#models';
 
@@ -32,11 +32,13 @@ const createTokens = async (userData: UserData): Promise<[string, string]> => {
 const setAuthCookies = (res: Response, refreshToken: string, accessToken: string) => {
   // add access token to cookie
   const isProduction = process.env.NODE_ENV === 'production';
-  const cookieOptions = {
+  const cookieOptions: CookieOptions = {
     httpOnly: true,
     sameSite: isProduction ? ('none' as const) : ('lax' as const),
     secure: isProduction
   };
+
+  if (isProduction) cookieOptions.domain = '.onrender.com';
 
   res.cookie('refreshToken', refreshToken, { ...cookieOptions, maxAge: REFRESH_TOKEN_TTL * 1000 });
 

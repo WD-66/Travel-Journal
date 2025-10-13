@@ -38,7 +38,8 @@ const setAuthCookies = (res: Response, refreshToken: string, accessToken: string
     secure: isProduction
   };
 
-  if (isProduction) cookieOptions.domain = '.onrender.com';
+  // could work if using a private subdomain (one you registered on cloudflare or a similar service)
+  // if (isProduction) cookieOptions.domain = '.onrender.com';
 
   res.cookie('refreshToken', refreshToken, { ...cookieOptions, maxAge: REFRESH_TOKEN_TTL * 1000 });
 
